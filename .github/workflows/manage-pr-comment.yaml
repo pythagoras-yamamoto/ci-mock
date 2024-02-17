@@ -21,7 +21,7 @@ jobs:
         with:
           script: |
             const prNumber = ${{ github.event.pull_request.number }};
-            const commentBody = `検索キーワード`; // ここを適宜修正
+            const commentBody = `検索キーワードを更新する`; // ここを適宜修正
             const searchKeyword = '検索キーワード'; // ここを適宜修正
 
             const comments = await github.rest.issues.listComments({
