@@ -1,0 +1,47 @@
+name: Manage PR Comment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  manage-pr-comment:
+    runs-on: ubuntu-latest
+    name: A job to manage PR comments
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Manage PR Comment
+        id: manage-comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ github.event.pull_request.number }};
+            const commentBody = `ここにコメント本文を入力`; // ここを適宜修正
+            const searchKeyword = '検索キーワード'; // ここを適宜修正
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const commentToUpdate = comments.data.find(comment => comment.body.startsWith(searchKeyword));
+
+            if (commentToUpdate) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: commentToUpdate.id,
+                body: commentBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody,
+              });
+            }
+          github-token: ${{ secrets.GITHUB_TOKEN }}
